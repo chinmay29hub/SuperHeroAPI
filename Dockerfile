@@ -17,7 +17,7 @@ RUN dotnet build "./SuperHeroAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN --mount=type=secret,id=_env,dst=/run/secrets/DATABASE_CONNECTION_STRING \
+RUN --mount=type=secret,id=_env,dst=/run/secrets/.env \
     dotnet publish "./SuperHeroAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=true /p:PublishSingleFile=false
 
 FROM base AS final
