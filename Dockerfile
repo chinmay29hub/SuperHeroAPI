@@ -10,15 +10,15 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["SuperHeroAPI.csproj", "."]
-RUN dotnet restore "./././SuperHeroAPI.csproj"
+RUN dotnet restore "./SuperHeroAPI.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./SuperHeroAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN --mount=type=secret,id=_env,dst=/run/secrets/.env \
+    dotnet build "./SuperHeroAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN --mount=type=secret,id=_env,dst=/run/secrets/.env \
-    dotnet publish "./SuperHeroAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=true /p:PublishSingleFile=false
+RUN dotnet publish "./SuperHeroAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=true /p:PublishSingleFile=false
 
 FROM base AS final
 WORKDIR /app
